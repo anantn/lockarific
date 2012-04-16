@@ -35,7 +35,7 @@ function LockarificUI:CreateBar(name, parent, max)
 	bar:SetWidth(gBarWidth)
 	bar:SetHeight(gBarHeight)
 
-	bar:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", parent.num * (gBarWidth + bBarPadding), 0)
+	bar:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", parent.num * (gBarWidth + gBarPadding), 0)
 	parent.num = parent.num + 1
 	bar:SetStatusBarColor(0, 1, 0)
 

@@ -1,21 +1,23 @@
 
 
-local gBarMax = 1000 -- 1000 gives better precision than 100
+-- 1000 gives better precision than 100
+local gBarMax = 1000
+local gCombat = false
 local gUpdateInterval = 0.1
 local gFrame, gSpells, gAuras = {}, {}, {}
 local gAffliction = {"Haunt", "Corruption", "Bane of Agony", "Unstable Affliction"}
 
 local Lockarific, Events = CreateFrame("Frame"), {}
 
-
-
 function Events:PLAYER_REGEN_DISABLED(args)
 	-- Player entered combat
-	Frame:Show() -- Showing frame starts OnUpdate events
+	gCombat = true
+	-- Showing frame starts OnUpdate events
+	gFrame:Show()
 end
 function Events:PLAYER_REGEN_ENABLED(args)
-	-- Player leaving combat
-	Frame:Hide() -- Hiding frame stops OnUpdate events
+	-- Player leaving combat, don't hide frame until debuffs fall
+	gCombat = false
 end
 
 function Lockarific:UpdateAuras()
@@ -25,8 +27,8 @@ function Lockarific:UpdateAuras()
 	gAuras = {}
 	repeat
 		local name, _, icon, count, _, duration, expirationTime, caster, _, _, spellId = UnitDebuff("target", index)
-		if (name) then
-			if (gSpells[name]) then
+		if name then
+			if gSpells[name] then
 				gAuras[name] = { count, duration, expirationTime - currentTime }
 			end
 			index = index + 1
@@ -35,6 +37,14 @@ function Lockarific:UpdateAuras()
 end
 
 function Lockarific:UpdateBars()
+	if not gCombat and next(gAuras) == nil then
+		for _, bar in pairs(gSpells) do
+			bar:SetValue(0)
+		end
+		gFrame:Hide()
+		return
+	end
+
 	for spell, bar in pairs(gSpells) do
 		if gAuras[spell] then
 			-- % of bar left is (timeLeft * 1000) / duration
@@ -52,7 +62,7 @@ function Lockarific:InitializeTimer(frame)
 	frame.timeSinceUpdate = 0
 	frame:SetScript("OnUpdate", function(self, elapsed)
 		self.timeSinceUpdate = self.timeSinceUpdate + elapsed
-		if (self.timeSinceUpdate > gUpdateInterval) then
+		if self.timeSinceUpdate > gUpdateInterval then
 			-- Find current state of Auras
 			Lockarific:UpdateAuras()
 			-- Update bars
