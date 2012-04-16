@@ -1,8 +1,9 @@
 
-LockarificUI = {}
 local gBarPadding = 5
 local gBarWidth, gBarHeight = 20, 250
 local gFrameWidth, gFrameHeight = 150, 250
+
+LockarificUI, gFrame = {}, {}
 
 function LockarificUI:CreateSpellSet(spells, max)
 	local set = {}

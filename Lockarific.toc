@@ -4,4 +4,3 @@
 ## Author: Narayanan, Anant
 LockarificUI.lua
 Lockarific.lua
-Lockarific.xml

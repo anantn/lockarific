@@ -1,8 +1,0 @@
-<ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\..\FrameXML\UI.xsd">
-	<script file="Lockarific.lua"/>
-	<frame name="MainFrame"> <!-- hehe -->
-		<scripts>
-			<OnLoad>OnLoad(self);</OnLoad>
-		</scripts>
-	</frame>
-</ui>

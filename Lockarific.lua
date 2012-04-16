@@ -73,7 +73,7 @@ function Lockarific:InitializeTimer(frame)
 	end)
 end
 
-function OnLoad(self)
+function Lockarific:Startup()
 	Lockarific:SetScript("OnEvent", function(self, event, ...)
 		Events[event](self, ...)
 	end)
@@ -85,3 +85,5 @@ function OnLoad(self)
 	gFrame, gSpells = LockarificUI:CreateSpellSet(gAffliction, gBarMax)
 	Lockarific:InitializeTimer(gFrame)
 end
+
+Lockarific:Startup()
