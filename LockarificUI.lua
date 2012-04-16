@@ -4,7 +4,7 @@ local barPadding = 5
 local barWidth, barHeight = 20, 250
 local frameWidth, frameHeight = 150, 250
 
-function LockarificUI:CreateSpellSet(spells, max)
+function LockarificUI:CreateSpellSet(spells)
 	local set = {}
 
 	local frame = CreateFrame("Frame", nil, UIParent)
@@ -21,7 +21,7 @@ function LockarificUI:CreateSpellSet(spells, max)
 		set[spell] = LockarificUI:CreateBar(nil, frame, max)
 	end
 
-	frame:Show()
+	frame:Hide()
 	return frame, set
 end
 
@@ -30,15 +30,14 @@ function LockarificUI:CreateBar(name, parent, max)
 
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	bar:SetOrientation("VERTICAL")
-	bar:SetMinMaxValues(0, max)
-	bar:SetValue(max)
+	bar:SetMinMaxValues(0, 100)
+	bar:SetValue(0)
 	bar:SetWidth(barWidth)
 	bar:SetHeight(barHeight)
 
 	bar:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", parent.num * (barWidth + barPadding), 0)
 	parent.num = parent.num + 1
 	bar:SetStatusBarColor(0, 1, 0)
-	bar:Hide()
 
 	return bar
 end

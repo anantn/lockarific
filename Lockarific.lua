@@ -1,38 +1,43 @@
 
 
 local updateInterval = 0.1
-local Frame, Spells = {}, {}
+local Frame, Spells, Auras = {}, {}, {}
 local Lockarific, Events = CreateFrame("Frame"), {}
 
 local Affliction = {"Haunt", "Corruption", "Bane of Agony", "Unstable Affliction"}
 
 function Events:PLAYER_REGEN_DISABLED(args)
 	-- Player entered combat
-	Frame:Show()
+	Frame:Show() -- Showing frame starts OnUpdate events
 end
 function Events:PLAYER_REGEN_ENABLED(args)
 	-- Player leaving combat
-	Frame:Hide()
-end
-
---[[
-function Events:UNIT_SPELLCAST_SUCCEEDED(caster, name, _, _, spellId)
-	if (Spells[name]) then
-		Spells[name]:Show()
+	Frame:Hide() -- Hiding frame stops OnUpdate events
+	for name, bar in pairs(Spells) do
+		bar:SetValue(0)
 	end
-	--Lockarific:PrintTargetAuras();
 end
-]]--
 
-function Lockarific:PrintTargetAuras()
+function Lockarific:UpdateAuras()
 	local index = 1
+	local currentTime = GetTime()
+
 	repeat
 		local name, _, icon, count, _, duration, expirationTime, caster, _, _, spellId = UnitDebuff("target", index)
-		if name then
-			print(name .. " on target!")
+		if (name) then
+			if (Spells[name]) then
+				Auras[name] = { count, duration, expirationTime - currentTime }
+			end
 			index = index + 1
 		end
 	until not name
+end
+
+function Lockarific:UpdateBars()
+	for spell, values in pairs(Auras) do
+		-- % of bar left is (timeLeft * 100) / duration
+		Spells[spell]:SetValue((values[3] * 100) / values[2])
+	end
 end
 
 function Lockarific:InitializeTimer(frame)
@@ -41,9 +46,9 @@ function Lockarific:InitializeTimer(frame)
 		self.timeSinceUpdate = self.timeSinceUpdate + elapsed
 		if (self.timeSinceUpdate > updateInterval) then
 			-- Find current state of Auras
-			--Lockarific:UpdateAuras()
+			Lockarific:UpdateAuras()
 			-- Update bars
-			--Lockarific:UpdateBars()
+			Lockarific:UpdateBars()
 			-- Reset
 			self.timeSinceUpdate = 0;
 		end
@@ -59,6 +64,6 @@ function OnLoad(self)
 	end
 
 	-- Initialize Affliction Bars
-	Frame, Spells = LockarificUI:CreateSpellSet(Affliction, 30)
+	Frame, Spells = LockarificUI:CreateSpellSet(Affliction)
 	Lockarific:InitializeTimer(Frame)
 end
