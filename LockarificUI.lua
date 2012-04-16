@@ -3,9 +3,9 @@
 LockarificUI, FramePoint = {}, {}, {}
 
 -- File scope
-local gTicks = {}
 local gBarMax = 1000
 local gBarPadding = 5
+local gTicks, gFlash = {}, {}
 local gBarWidth, gBarHeight = 20, 250
 local gFrameWidth, gFrameHeight = 150, 250
 
@@ -72,6 +72,19 @@ function LockarificUI:CreateBar(name, parent, spell)
 	parent.num = parent.num + 1
 	bar._spell = spellName
 	return bar
+end
+
+function LockarificUI:ShowTickFlash(bar)
+	if not gFlash[bar] then
+		local texture = bar:CreateTexture(nil, "OVERLAY")
+		texture:SetWidth(bar:GetWidth())
+		texture:SetTexture(1, 0, 0, 1)
+		texture:SetPoint("BOTTOM", bar, "BOTTOM")
+		texture:Hide()
+		gFlash[bar] = texture
+	end
+	gFlash[bar]:SetHeight((bar:GetHeight() * bar:GetValue()) / gBarMax)
+	UIFrameFlash(gFlash[bar], 0.1, 0.1, 0.4, false, 0, 0.2)
 end
 
 function LockarificUI:SetSpell(bar, time, duration)

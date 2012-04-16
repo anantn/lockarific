@@ -1,5 +1,4 @@
 -- TODO:
--- Flash bar on tick
 -- Fix tick prediction
 -- Make bar red when it is ideal time to recast the spell
 -- Customizable number of bars & spells
@@ -37,13 +36,13 @@ function Events:COMBAT_LOG_EVENT_UNFILTERED(time, event, _, source, _, _, _, tar
 		return
 	end
 
-
 	local spell = select(2, ...)
 	if not gSpells[spell] then
 		return
 	end
 
 	print(spell .. " ticked")
+	LockarificUI:ShowTickFlash(gSpells[spell])
 
 	local function round(num, idp)
 	local mult = 10^(idp or 0)
