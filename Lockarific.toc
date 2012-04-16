@@ -1,0 +1,7 @@
+## Interface: 40300
+## Title: Lockarific
+## Notes: Warlocks are Terrific!
+## Author: Narayanan, Anant
+LockarificUI.lua
+Lockarific.lua
+Lockarific.xml
