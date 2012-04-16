@@ -3,11 +3,12 @@
 LockarificUI, FramePoint = {}, {}, {}
 
 -- File scope
+local gBarMax = 1000
 local gBarPadding = 5
 local gBarWidth, gBarHeight = 20, 250
 local gFrameWidth, gFrameHeight = 150, 250
 
-function LockarificUI:CreateSpellSet(spells, max)
+function LockarificUI:CreateSpellSet(spells)
 	local spellSet = {}
 
 	local frame = CreateFrame("Frame", nil, UIParent)
@@ -36,19 +37,19 @@ function LockarificUI:CreateSpellSet(spells, max)
 
 	frame.num = 0
 	for _, spell in pairs(spells) do
-		spellSet[spell] = LockarificUI:CreateBar(nil, frame, max, spell)
+		spellSet[spell] = LockarificUI:CreateBar(nil, frame, spell)
 	end
 
 	frame:Hide()
 	return frame, spellSet
 end
 
-function LockarificUI:CreateBar(name, parent, max, spell)
+function LockarificUI:CreateBar(name, parent, spell)
 	local bar = CreateFrame("StatusBar", name, parent)
 
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	bar:SetOrientation("VERTICAL")
-	bar:SetMinMaxValues(0, max)
+	bar:SetMinMaxValues(0, gBarMax)
 	bar:SetValue(0)
 	bar:SetWidth(gBarWidth)
 	bar:SetHeight(gBarHeight)
@@ -66,4 +67,13 @@ function LockarificUI:CreateBar(name, parent, max, spell)
 
 	parent.num = parent.num + 1
 	return bar
+end
+
+function LockarificUI:SetSpell(bar, timeLeft, duration)
+	-- Convert times to % of bar remaining
+	bar:SetValue((timeLeft * gBarMax) / duration)
+end
+
+function LockarificUI:SetSpellTick(bar, value)
+	--
 end

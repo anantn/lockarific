@@ -1,16 +1,14 @@
 
--- 1000 gives better precision than 100
-local gBarMax = 1000
 local gCombat = false
 local gUpdateInterval = 0.1
-local gFrame, gSpells, gAuras = {}, {}, {}
+local gFrame, gSpells, gAuras, gTicks, gLog = {}, {}, {}, {}, {}
 local gAffliction = {"Haunt", "Corruption", "Bane of Agony", "Unstable Affliction"}
 
 local Lockarific, Events = CreateFrame("Frame"), {}
 
 function Events:ADDON_LOADED()
 	-- Initialize Affliction Bars
-	gFrame, gSpells = LockarificUI:CreateSpellSet(gAffliction, gBarMax)
+	gFrame, gSpells = LockarificUI:CreateSpellSet(gAffliction)
 	Lockarific:InitializeTimer()
 end
 function Events:PLAYER_REGEN_DISABLED()
@@ -22,6 +20,32 @@ end
 function Events:PLAYER_REGEN_ENABLED()
 	-- Player leaving combat, don't hide frame until debuffs fall
 	gCombat = false
+end
+function Events:COMBAT_LOG_EVENT_UNFILTERED(time, event, _, source, _, _, _, target, _, _, _, ...)
+	if source ~= UnitGUID("player") then
+		return
+	end
+	if target ~= UnitGUID("target") then
+		return
+	end
+
+	if not string.find(event, "SPELL_PERIODIC") then
+		return
+	end
+
+	if not gSpells[spell] then
+		return
+	end
+
+	-- Luckily for us, only the difference in times matters!
+	-- The timestamp in the combat log is milliseconds since epoch,
+	-- while GetTime() which is used in UpdateBars() is milliseconds since boot.
+	if not gLog[spell] then
+		gLog[spell] = time
+	else
+		gTicks[spell] = time - gLog[spell]
+		gLog[spell] = time
+	end
 end
 
 function Lockarific:UpdateAuras()
@@ -51,9 +75,21 @@ function Lockarific:UpdateBars()
 
 	for spell, bar in pairs(gSpells) do
 		if gAuras[spell] then
-			-- % of bar left is (timeLeft * 1000) / duration
 			local values = gAuras[spell]
-			bar:SetValue((values[3] * gBarMax) / values[2])
+			local timeLeft = values[3]
+			local duration = values[2]
+
+			-- Set spell bar height
+			LockarificUI:SetSpell(bar, timeLeft, duration)
+
+			-- If we can calculate the next tick, we should
+			if (gTicks[spell]) then
+				-- The next tick will be at (number of ticks so far) * (tick length)
+				-- from the start of the debuff
+				local nextTick = math.floor(duration / tick) * gTicks[spell]
+				-- Convert that to a length based on total bar length
+				-- bar:SetTick(bar, (nextTick * gBarHeight) / duration)
+			end
 		else
 			-- Debuff dropped, set to 0
 			bar:SetValue(0)
