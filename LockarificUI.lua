@@ -54,7 +54,6 @@ function LockarificUI:CreateBar(name, parent, max, spell)
 	bar:SetHeight(gBarHeight)
 
 	bar:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", parent.num * (gBarWidth + gBarPadding), 0)
-	parent.num = parent.num + 1
 	bar:SetStatusBarColor(0, 1, 0)
 
 	-- Get icon and put it under bar
@@ -65,5 +64,6 @@ function LockarificUI:CreateBar(name, parent, max, spell)
 	texture:SetTexture(icon)
 	texture:SetPoint("TOP", bar, "BOTTOM")
 
+	parent.num = parent.num + 1
 	return bar
 end

@@ -11,7 +11,7 @@ local Lockarific, Events = CreateFrame("Frame"), {}
 function Events:ADDON_LOADED()
 	-- Initialize Affliction Bars
 	gFrame, gSpells = LockarificUI:CreateSpellSet(gAffliction, gBarMax)
-	Lockarific:InitializeTimer(gFrame)
+	Lockarific:InitializeTimer()
 end
 function Events:PLAYER_REGEN_DISABLED()
 	-- Player entered combat
@@ -63,8 +63,8 @@ end
 
 function Lockarific:InitializeTimer()
 	-- Throttle updates to every gUpdateInterval seconds
-	frame.timeSinceUpdate = 0
-	frame:SetScript("OnUpdate", function(self, elapsed)
+	gFrame.timeSinceUpdate = 0
+	gFrame:SetScript("OnUpdate", function(self, elapsed)
 		self.timeSinceUpdate = self.timeSinceUpdate + elapsed
 		if self.timeSinceUpdate > gUpdateInterval then
 			-- Find current state of Auras
