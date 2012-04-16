@@ -1,5 +1,6 @@
 
 
+local barMax = 1000 -- 1000 gives better precision than 100
 local updateInterval = 0.1
 local Frame, Spells, Auras = {}, {}, {}
 local Lockarific, Events = CreateFrame("Frame"), {}
@@ -13,15 +14,13 @@ end
 function Events:PLAYER_REGEN_ENABLED(args)
 	-- Player leaving combat
 	Frame:Hide() -- Hiding frame stops OnUpdate events
-	for name, bar in pairs(Spells) do
-		bar:SetValue(0)
-	end
 end
 
 function Lockarific:UpdateAuras()
 	local index = 1
 	local currentTime = GetTime()
-
+	
+	Auras = {}
 	repeat
 		local name, _, icon, count, _, duration, expirationTime, caster, _, _, spellId = UnitDebuff("target", index)
 		if (name) then
@@ -34,9 +33,15 @@ function Lockarific:UpdateAuras()
 end
 
 function Lockarific:UpdateBars()
-	for spell, values in pairs(Auras) do
-		-- % of bar left is (timeLeft * 100) / duration
-		Spells[spell]:SetValue((values[3] * 100) / values[2])
+	for spell, bar in pairs(Spells) do
+		if Auras[spell] then
+			-- % of bar left is (timeLeft * 1000) / duration
+			local values = Auras[spell]
+			bar:SetValue((values[3] * barMax) / values[2])
+		else
+			-- Debuff dropped, set to 0
+			bar:SetValue(0)
+		end
 	end
 end
 
@@ -64,6 +69,6 @@ function OnLoad(self)
 	end
 
 	-- Initialize Affliction Bars
-	Frame, Spells = LockarificUI:CreateSpellSet(Affliction)
+	Frame, Spells = LockarificUI:CreateSpellSet(Affliction, barMax)
 	Lockarific:InitializeTimer(Frame)
 end
