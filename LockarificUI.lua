@@ -3,6 +3,7 @@
 LockarificUI, FramePoint = {}, {}, {}
 
 -- File scope
+local gTicks = {}
 local gBarMax = 1000
 local gBarPadding = 5
 local gBarWidth, gBarHeight = 20, 250
@@ -47,6 +48,7 @@ end
 function LockarificUI:CreateBar(name, parent, spell)
 	local bar = CreateFrame("StatusBar", name, parent)
 
+	-- Setup spell bar
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	bar:SetOrientation("VERTICAL")
 	bar:SetMinMaxValues(0, gBarMax)
@@ -54,26 +56,40 @@ function LockarificUI:CreateBar(name, parent, spell)
 	bar:SetWidth(gBarWidth)
 	bar:SetHeight(gBarHeight)
 
+	-- Attach bar to spellSet frame
 	bar:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", parent.num * (gBarWidth + gBarPadding), 0)
 	bar:SetStatusBarColor(0, 1, 0)
 
 	-- Get icon and put it under bar
-	sname, _, icon = GetSpellInfo(spell)
+	spellName, _, icon = GetSpellInfo(spell)
 	local texture = bar:CreateTexture(nil, "BORDER")
 	texture:SetWidth(gBarWidth)
 	texture:SetHeight(gBarWidth)
 	texture:SetTexture(icon)
 	texture:SetPoint("TOP", bar, "BOTTOM")
 
+	-- Make sure the next bar to be added to this set is offset
 	parent.num = parent.num + 1
+	bar._spell = spellName
 	return bar
 end
 
-function LockarificUI:SetSpell(bar, timeLeft, duration)
+function LockarificUI:SetSpell(bar, time, duration)
 	-- Convert times to % of bar remaining
-	bar:SetValue((timeLeft * gBarMax) / duration)
+	bar:SetValue((time * gBarMax) / duration)
 end
 
-function LockarificUI:SetSpellTick(bar, value)
-	--
+function LockarificUI:SetSpellTick(bar, tickLength, timeLeft, duration)
+	-- Placement of tick (from top) = tickLenSoFar + tickLength
+	local elapsed = duration - timeLeft
+	local nextTick = math.floor(elapsed / tickLength) + tickLength
+
+	-- Convert nextTick (time) to length
+	local nextTickOffset = (nextTick * gBarHeight) / duration
+
+	local texture = bar:CreateTexture(nil, "OVERLAY")
+	texture:SetHeight(1)
+	texture:SetWidth(gBarWidth)
+	texture:SetTexture(1, 1, 1, 1)
+	texture:SetPoint("TOP", bar, "TOP", 0, -nextTickOffset)
 end

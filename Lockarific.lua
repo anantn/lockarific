@@ -28,14 +28,17 @@ function Events:COMBAT_LOG_EVENT_UNFILTERED(time, event, _, source, _, _, _, tar
 	if target ~= UnitGUID("target") then
 		return
 	end
-
 	if not string.find(event, "SPELL_PERIODIC") then
 		return
 	end
 
+
+	local spell = select(2, ...)
 	if not gSpells[spell] then
 		return
 	end
+
+	print(spell .. " ticked")
 
 	-- Luckily for us, only the difference in times matters!
 	-- The timestamp in the combat log is milliseconds since epoch,
@@ -76,19 +79,17 @@ function Lockarific:UpdateBars()
 	for spell, bar in pairs(gSpells) do
 		if gAuras[spell] then
 			local values = gAuras[spell]
-			local timeLeft = values[3]
 			local duration = values[2]
+			local timeLeft = values[3]
 
 			-- Set spell bar height
 			LockarificUI:SetSpell(bar, timeLeft, duration)
 
 			-- If we can calculate the next tick, we should
 			if (gTicks[spell]) then
-				-- The next tick will be at (number of ticks so far) * (tick length)
-				-- from the start of the debuff
-				local nextTick = math.floor(duration / tick) * gTicks[spell]
-				-- Convert that to a length based on total bar length
-				-- bar:SetTick(bar, (nextTick * gBarHeight) / duration)
+				-- UI will convert this info to a length
+				LockarificUI:SetSpellTick(bar, gTicks[spell], timeLeft, duration)
+				gTicks[spell] = nil
 			end
 		else
 			-- Debuff dropped, set to 0
