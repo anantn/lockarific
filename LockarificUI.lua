@@ -13,6 +13,12 @@ function LockarificUI:CreateSpellSet(spells, max)
 	background:SetTexture(0, 0, 0, 0.25)
 	background:SetAllPoints()
 
+	frame:SetMovable(true)
+	frame:EnableMouse(true)
+	frame:RegisterForDrag("RightButton")
+	frame:SetScript("OnDragStart", frame.StartMoving)
+	frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+
 	frame:SetPoint("CENTER", UIParent)
 	frame:SetWidth(gFrameWidth)
 	frame:SetHeight(gFrameHeight)
