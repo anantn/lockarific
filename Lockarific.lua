@@ -8,18 +8,18 @@ local gAffliction = {"Haunt", "Corruption", "Bane of Agony", "Unstable Afflictio
 
 local Lockarific, Events = CreateFrame("Frame"), {}
 
-function Events:ADDON_LOADED(arg)
+function Events:ADDON_LOADED()
 	-- Initialize Affliction Bars
 	gFrame, gSpells = LockarificUI:CreateSpellSet(gAffliction, gBarMax)
 	Lockarific:InitializeTimer(gFrame)
 end
-function Events:PLAYER_REGEN_DISABLED(args)
+function Events:PLAYER_REGEN_DISABLED()
 	-- Player entered combat
 	gCombat = true
 	-- Showing frame starts OnUpdate events
 	gFrame:Show()
 end
-function Events:PLAYER_REGEN_ENABLED(args)
+function Events:PLAYER_REGEN_ENABLED()
 	-- Player leaving combat, don't hide frame until debuffs fall
 	gCombat = false
 end
@@ -61,7 +61,7 @@ function Lockarific:UpdateBars()
 	end
 end
 
-function Lockarific:InitializeTimer(frame)
+function Lockarific:InitializeTimer()
 	-- Throttle updates to every gUpdateInterval seconds
 	frame.timeSinceUpdate = 0
 	frame:SetScript("OnUpdate", function(self, elapsed)

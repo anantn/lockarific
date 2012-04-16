@@ -8,7 +8,7 @@ local gBarWidth, gBarHeight = 20, 250
 local gFrameWidth, gFrameHeight = 150, 250
 
 function LockarificUI:CreateSpellSet(spells, max)
-	local set = {}
+	local spellSet = {}
 
 	local frame = CreateFrame("Frame", nil, UIParent)
 	local background = frame:CreateTexture(nil, "BACKGROUND")
@@ -36,14 +36,14 @@ function LockarificUI:CreateSpellSet(spells, max)
 
 	frame.num = 0
 	for _, spell in pairs(spells) do
-		set[spell] = LockarificUI:CreateBar(nil, frame, max)
+		spellSet[spell] = LockarificUI:CreateBar(nil, frame, max, spell)
 	end
 
 	frame:Hide()
-	return frame, set
+	return frame, spellSet
 end
 
-function LockarificUI:CreateBar(name, parent, max)
+function LockarificUI:CreateBar(name, parent, max, spell)
 	local bar = CreateFrame("StatusBar", name, parent)
 
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
@@ -56,6 +56,14 @@ function LockarificUI:CreateBar(name, parent, max)
 	bar:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", parent.num * (gBarWidth + gBarPadding), 0)
 	parent.num = parent.num + 1
 	bar:SetStatusBarColor(0, 1, 0)
+
+	-- Get icon and put it under bar
+	sname, _, icon = GetSpellInfo(spell)
+	local texture = bar:CreateTexture(nil, "BORDER")
+	texture:SetWidth(gBarWidth)
+	texture:SetHeight(gBarWidth)
+	texture:SetTexture(icon)
+	texture:SetPoint("TOP", bar, "BOTTOM")
 
 	return bar
 end
