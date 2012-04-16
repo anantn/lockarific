@@ -79,17 +79,31 @@ function LockarificUI:SetSpell(bar, time, duration)
 	bar:SetValue((time * gBarMax) / duration)
 end
 
-function LockarificUI:SetSpellTick(bar, tickLength, timeLeft, duration)
-	-- Placement of tick (from top) = tickLenSoFar + tickLength
-	local elapsed = duration - timeLeft
-	local nextTick = math.floor(elapsed / tickLength) + tickLength
+function LockarificUI:SetSpellTick(bar, tickLength, duration)
+	-- Total ticks at current tickLength for duration
+	local total = math.floor(duration / tickLength)
+	local height = bar:GetHeight() / total
 
-	-- Convert nextTick (time) to length
-	local nextTickOffset = (nextTick * gBarHeight) / duration
+	if not gTicks[bar] then
+		gTicks[bar] = {}
+	end
 
-	local texture = bar:CreateTexture(nil, "OVERLAY")
-	texture:SetHeight(1)
-	texture:SetWidth(gBarWidth)
-	texture:SetTexture(1, 1, 1, 1)
-	texture:SetPoint("TOP", bar, "TOP", 0, -nextTickOffset)
+	-- Draw ticks
+	local tick = 1
+	while tick <= total do
+		-- If previous tick exists, just move it
+		local texture = nil
+		if gTicks[bar][tick] then
+			texture = gTicks[bar][tick]
+		else
+			texture = bar:CreateTexture(nil, "OVERLAY")
+			texture:SetHeight(1)
+			texture:SetWidth(bar:GetWidth())
+			texture:SetTexture(1, 1, 1, 1)
+			table.insert(gTicks[bar], texture)
+		end
+
+		texture:SetPoint("TOP", bar, "TOP", 0, -(tick * height))
+		tick = tick + 1
+	end
 end

@@ -1,3 +1,8 @@
+-- TODO:
+-- Flash bar on tick
+-- Fix tick prediction
+-- Make bar red when it is ideal time to recast the spell
+-- Customizable number of bars & spells
 
 local gCombat = false
 local gUpdateInterval = 0.1
@@ -40,14 +45,22 @@ function Events:COMBAT_LOG_EVENT_UNFILTERED(time, event, _, source, _, _, _, tar
 
 	print(spell .. " ticked")
 
+	local function round(num, idp)
+	local mult = 10^(idp or 0)
+		return math.floor(num * mult + 0.5) / mult
+	end
+
 	-- Luckily for us, only the difference in times matters!
 	-- The timestamp in the combat log is milliseconds since epoch,
 	-- while GetTime() which is used in UpdateBars() is milliseconds since boot.
 	if not gLog[spell] then
 		gLog[spell] = time
 	else
-		gTicks[spell] = time - gLog[spell]
+		-- This number is varying too much
+		-- Perhaps if we could calculate tickLength just once at the beginning of a cast?
+		gTicks[spell] = round(time - gLog[spell], 1)
 		gLog[spell] = time
+		LockarificUI:SetSpellTick(gSpells[spell], gTicks[spell], gAuras[spell][2])
 	end
 end
 
@@ -79,18 +92,8 @@ function Lockarific:UpdateBars()
 	for spell, bar in pairs(gSpells) do
 		if gAuras[spell] then
 			local values = gAuras[spell]
-			local duration = values[2]
-			local timeLeft = values[3]
-
-			-- Set spell bar height
-			LockarificUI:SetSpell(bar, timeLeft, duration)
-
-			-- If we can calculate the next tick, we should
-			if (gTicks[spell]) then
-				-- UI will convert this info to a length
-				LockarificUI:SetSpellTick(bar, gTicks[spell], timeLeft, duration)
-				gTicks[spell] = nil
-			end
+			-- Update spell bar height
+			LockarificUI:SetSpell(bar, values[3], values[2])
 		else
 			-- Debuff dropped, set to 0
 			bar:SetValue(0)
