@@ -1,5 +1,4 @@
 
-
 -- 1000 gives better precision than 100
 local gBarMax = 1000
 local gCombat = false
@@ -9,6 +8,11 @@ local gAffliction = {"Haunt", "Corruption", "Bane of Agony", "Unstable Afflictio
 
 local Lockarific, Events = CreateFrame("Frame"), {}
 
+function Events:ADDON_LOADED(arg)
+	-- Initialize Affliction Bars
+	gFrame, gSpells = LockarificUI:CreateSpellSet(gAffliction, gBarMax)
+	Lockarific:InitializeTimer(gFrame)
+end
 function Events:PLAYER_REGEN_DISABLED(args)
 	-- Player entered combat
 	gCombat = true
@@ -80,10 +84,6 @@ function Lockarific:Startup()
 	for k, v in pairs(Events) do
 		Lockarific:RegisterEvent(k)
 	end
-
-	-- Initialize Affliction Bars
-	gFrame, gSpells = LockarificUI:CreateSpellSet(gAffliction, gBarMax)
-	Lockarific:InitializeTimer(gFrame)
 end
 
 Lockarific:Startup()

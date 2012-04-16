@@ -1,9 +1,11 @@
 
+-- True globals
+LockarificUI, FramePoint = {}, {}, {}
+
+-- File scope
 local gBarPadding = 5
 local gBarWidth, gBarHeight = 20, 250
 local gFrameWidth, gFrameHeight = 150, 250
-
-LockarificUI, gFrame = {}, {}
 
 function LockarificUI:CreateSpellSet(spells, max)
 	local set = {}
@@ -17,9 +19,18 @@ function LockarificUI:CreateSpellSet(spells, max)
 	frame:EnableMouse(true)
 	frame:RegisterForDrag("RightButton")
 	frame:SetScript("OnDragStart", frame.StartMoving)
-	frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+	frame:SetScript("OnDragStop", function()
+		frame:StopMovingOrSizing()
+		FramePoint["point"], _, FramePoint["relativePoint"], FramePoint["x"], FramePoint["y"] =
+			frame:GetPoint()
+	end)
 
-	frame:SetPoint("CENTER", UIParent)
+	if next(FramePoint) == nil then
+		frame:SetPoint("CENTER", UIParent)
+	else
+		frame:SetPoint(FramePoint["point"], UIParent, FramePoint["relativePoint"], FramePoint["x"], FramePoint["y"])
+	end
+
 	frame:SetWidth(gFrameWidth)
 	frame:SetHeight(gFrameHeight)
 

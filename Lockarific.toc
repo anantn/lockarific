@@ -2,5 +2,6 @@
 ## Title: Lockarific
 ## Notes: Warlocks are Terrific!
 ## Author: Narayanan, Anant
+## SavedVariablesPerCharacter: FramePoint
 LockarificUI.lua
 Lockarific.lua
